@@ -281,13 +281,15 @@
 
 	    // To search diagnosis 
     $('#search_diagnosis_btn').click(function(){ 
-    		var searchByNameURL = TRUCARE_API + "diagnosis-codes?name=" + document.getElementById('diagnosis').value;
+    		var searchByNameURL = TRUCARE_API + "diagnosis-codes?code=" + document.getElementById('diagnosis').value;
+    		$("#diagnosis_search").empty();
             callDiagnosisSearch(prepareGetTruCare(searchByNameURL));
     });
 
 	    // To search procedure 
     $('#search_procedure_btn').click(function(){ 
-    		var searchByNameURL = TRUCARE_API + "procedure-codes?name" + document.getElementById('procedure').value;
+    		var searchByNameURL = TRUCARE_API + "procedure-codes?code=" + document.getElementById('procedure').value;
+    		$("#procedure_search").empty();
             callProcedureSearch(prepareGetTruCare(searchByNameURL));
     });
 
@@ -327,11 +329,15 @@ function fillSelectors(){
 function prepareGetTruCare(url){
 	
 	// Get some values from elements on the page
-	var settings = {
+	var settings = 
+	{
 	  "async": true,
 	  "crossDomain": true,
 	  "url": url,
 	  "method": "GET",
+	  "headers": {
+		"Authorization": "Basic " + btoa("Tesch:Password1")
+	  }	  
 	};
 
 	return settings;
@@ -340,16 +346,21 @@ function prepareGetTruCare(url){
 function preparePostTruCare(url, dataJson){
 	
 	// Get some values from elements on the page
-	var settings = {
-	  "async": true,
-	  "crossDomain": true,
-	  "url": url,
-	  "method": "POST",
-	  "headers": {
-		"content-type": "application/json",
-	  },
-	  "processData": false,
-	  "data": dataJson
+	var settings = 
+	{
+		"async": true,
+	    "crossDomain": true,
+	    "url": url,
+		"method": "POST",
+	    "xhrFields": {
+	        "withCredentials": true
+	    },
+	    "headers": {
+	    	"content-type": "application/json",	    	
+	        "Authorization": "Basic " + btoa("Tesch:Password1")
+	    },
+	    "processData": false,
+	    "data": dataJson
 	};
 
 	return settings;
@@ -370,7 +381,9 @@ function callProcedureSearch(settings){
 	//Response of call to Trucare API
 	$.ajax(settings).done(
 			function(response) {
-				document.getElementById('procedure_search').innerHTML = response[0].procedureName;
+				for (var i in response){
+					   $('<option/>').val(response[i].diagnosisCode).html(response[i].diagnosisName).appendTo('#procedure_search');
+				}				
 			});		
 }
 
@@ -378,7 +391,9 @@ function callDiagnosisSearch(settings){
 	//Response of call to Trucare API
 	$.ajax(settings).done(
 			function(response) {
-				document.getElementById('diagnosis_search').innerHTML = response[0].diagnosisName;
+				for (var i in response){
+					   $('<option/>').val(response[i].diagnosisCode).html(response[i].diagnosisName).appendTo('#diagnosis_search');
+				}				
 			});		
 }
 
@@ -444,4 +459,4 @@ function prepareMemberSearch(){
 	return values;						
 }
 	
-var TRUCARE_API = "http://Tesch:Password1@50.225.27.88:9080/trucare-api-6.2.0.TC620/6.2.0/api/";		
+var TRUCARE_API = "http://50.225.27.88:9080/trucare-api-6.2.0.TC620/6.2.0/api/";		
