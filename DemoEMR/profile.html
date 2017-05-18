@@ -29,10 +29,15 @@
         <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
     <![endif]-->
 
+    <!-- DatePicker classes -->
+    <link rel="stylesheet" type="text/css" href="vendor/bootstrap/css/Style.css">
+	<script type="text/javascript" src="vendor/jquery/jquery-1.10.2.min.js"></script>
+    <link href="vendor/bootstrap/DatePicker/bootstrap-datepicker.css" rel="stylesheet" />
+	<script src="vendor/bootstrap/DatePicker/bootstrap-datepicker.js"></script>
+
 </head>
 
-<body id="page-top" class="index">
-<div id="skipnav"><a href="#maincontent">Skip to main content</a></div>
+<body id="page-top" class="index" onload="javascript:fillSelectors();">
 
     <!-- Navigation -->
     <nav id="mainNav" class="navbar navbar-default navbar-fixed-top navbar-custom">
@@ -269,13 +274,13 @@
                                         <label class="label-form-group">Admit Date/Time:</label>
                                     </div>
                                     <div class="col-lg-2">
-                                        <input type="text" class="datepicker" placeholder="" id="admit_dt" > 
+                                        <input type="text" class="datepicker form-control" placeholder="" id="admit_dt" > 
                                     </div>
                                     <div class="col-lg-1">
                                         <label class="label-form-group">Discharge Date/Time:</label>
                                     </div>
                                     <div class="col-lg-2">
-                                        <input type="text" class="form-control" placeholder="" id="discharge_dt" > 
+                                        <input type="text" class="datepicker form-control" placeholder="" id="discharge_dt" > 
                                     </div>
                                 </div>
                                 <div class="row spacer">
@@ -338,6 +343,8 @@
                                         <input type="text" class="form-control" placeholder="" id="ref-phys" > 
                                     </div>
                                 </div>
+
+
                                 <div class="row spacer">
                                     <div class="col-lg-1">
                                         <label class="label-form-group">Diagnosis:</label>
@@ -345,17 +352,23 @@
                                     <div class="col-lg-2">
                                         <input type="text" class="form-control" placeholder="" id="diagnosis" > 
                                     </div>
-                                    <div class="col-lg-2">
-                                        <button type="button" id="search1_btn" class="btn btn-success btn-sm">SEARCH</button>
+                                    <div class="col-lg-1">
+                                        <button type="button" id="search_diagnosis_btn" class="btn btn-success btn-sm">SEARCH</button>
                                     </div>
-                                    <div class="col-lg-1 col-md-offset-1">
+                                    <div class="col-lg-2">
+                                        <label class="label-form-group" id="diagnosis_search" />
+                                    </div>
+                                    <div class="col-lg-1">
                                         <label class="label-form-group">Procedure:</label>
                                     </div>
                                     <div class="col-lg-2">
-                                        <input type="text" class="form-control" placeholder="" id="ref-phys" > 
+                                        <input type="text" class="form-control" placeholder="" id="procedure" >  
+                                    </div>
+                                    <div class="col-lg-1">
+                                        <button type="button" id="search_procedure_btn" class="btn btn-success btn-sm">SEARCH</button>
                                     </div>
                                     <div class="col-lg-2">
-                                        <button type="button" id="search2_btn" class="btn btn-success btn-sm">SEARCH</button>
+                                        <label class="label-form-group" id="procedure_search" />
                                     </div>
                                 </div>
                                 <div class="row spacer">
@@ -686,8 +699,6 @@ CCDA
         </div>
     </div>
     </div>
-    <!-- jQuery -->
-    <script src="vendor/jquery/jquery.min.js"></script>
 
     <!-- Bootstrap Core JavaScript -->
     <script src="vendor/bootstrap/js/bootstrap.min.js"></script>

@@ -6,6 +6,8 @@
     var progressBarValue;
     var res, res2;
     var hl7_type;
+
+
     $('#searchModal').modal('show');
 
     $('#xyz-hospital').click(function() {
@@ -245,68 +247,8 @@
     // Defines the datepicker class
     $('.datepicker').datepicker({
     	format: 'yyyy-mm-dd',
+    	timepicker: true,
     	autoclose: true
-	});
-				
-	// Attach a submit handler to the form
-	$( '#searchForm' ).submit(function( event ) {
-	
-		//Stop form from submitting normally
-		event.preventDefault();
-
-		console.log( "Before posting");
-  
-		var $form = $( this ),
-		url = "http://Tesch:Password1@50.225.27.88:9080/trucare-api-6.2.0.TC620/6.2.0/api/members-search",//$form.attr( "action" );
-
-		// Send the data using post 
-		memberSearch = prepareMemberSearch();					
- 
-	    alert("Msj to send: " + memberSearch);
-	    
-		// Get some values from elements on the page:
-		var settings = {
-		  "async": true,
-		  "crossDomain": true,
-		  "url": url,
-		  "method": "POST",
-		  "headers": {
-			"content-type": "application/json",
-		  },
-		  "processData": false,
-		  "data": memberSearch
-		};
-
-		//Response of call to Trucare API
-		$.ajax(settings).done(
-				function(response) {
-					var buttonProfile = "<td style=\"text-align: center\" id=\"btn-text\" >"
-							+ "<button type=\"button\" onclick=\"location.href=\'profile.html\';\" id=\"select_btn\" class=\"btn btn-success btn-sm\">SELECT</button>"
-							+ "</td>";
-
-					//Fake profile
-					var newRow = document.createElement('tr');
-					newRow.innerHTML += buttonProfile + 
-							"<td>" + '1000000' + "</td>" + 
-							"<td>" + 'Jane' + "</td>" + 
-							"<td>" + 'Doe' + "</td>" + 
-							"<td>" + '1959-03-03' + "</td>";
-
-					document.getElementById('tableBody').appendChild(newRow);
-
-					// Profiles from Trucare
-					for ( var i in response.searchResults) {
-						var newRow = document.createElement('tr');
-						newRow.innerHTML += buttonProfile + 
-								"<td>" + response.searchResults[i].externalMemberId + "</td>" + 
-								"<td>" + response.searchResults[i].firstName + "</td>" + 
-								"<td>" + response.searchResults[i].lastName + "</td>" + 
-								"<td>" + response.searchResults[i].dateOfBirth + "</td>";
-
-						document.getElementById('tableBody').appendChild(newRow);
-					}
-					console.log(response);
-		});
 	});
 
     // Floating label headings for the contact form
@@ -320,36 +262,36 @@
         });
     });
 
-	function prepareMemberSearch(){
-		var elements = '';
-		if (document.getElementById('patient_id').value.length != 0){
-			elements += '"externalMemberId" : "'+ 
-				document.getElementById('patient_id').value +
-				'",\r\n';
-		}
-		if (document.getElementById('first_name').value.length != 0){
-			elements += '"firstName" : "'+ 
-				document.getElementById('first_name').value +
-				'",\r\n';
-		}
-		if (document.getElementById('last_name').value.length != 0){
-			elements += '"lastName" : "'+ 
-				document.getElementById('last_name').value +
-				'",\r\n';
-		}
-		if (document.getElementById('_dob').value.length != 0){
-			elements += '"dob" : "'+ 
-				document.getElementById('_dob').value +
-				'",\r\n';
-		}
-		
-		var value01 = '{"startIndex" : 0,"length" : 10,\r\n';
-		var value02 = '"gotoLastPage" : false}'
-	
-		var values = value01 + elements + value02
-		return values;						
-	}
-	
+	// Attach a submit handler to the form
+	$( '#searchForm' ).submit(function( event ) {
+
+		console.log( "Before posting");
+		//Stop form from submitting normally
+		event.preventDefault();
+  
+		var url = TRUCARE_API + "members-search";
+
+		//Prepare data to send
+		var memberSearch = prepareMemberSearch();
+	    alert("Message to send:\n"+ memberSearch);
+
+		// Send the data using post 	    
+	    callMemberSearch( preparePostTruCare(url, memberSearch) );
+	});
+
+	    // To search diagnosis 
+    $('#search_diagnosis_btn').click(function(){ 
+    		var searchByNameURL = TRUCARE_API + "diagnosis-codes?name=" + document.getElementById('diagnosis').value;
+            callDiagnosisSearch(prepareGetTruCare(searchByNameURL));
+    });
+
+	    // To search procedure 
+    $('#search_procedure_btn').click(function(){ 
+    		var searchByNameURL = TRUCARE_API + "procedure-codes?name" + document.getElementById('procedure').value;
+            callProcedureSearch(prepareGetTruCare(searchByNameURL));
+    });
+
+
     function addXML() {
         var xml = 'CCDA' +
             '&lt;?xml version="1.0" encoding="utf-8"?&gt;&lt;?xml-stylesheet type="text/xsl" href="CECDocDisplay.xsl"?&gt;<br/>' +
@@ -374,3 +316,132 @@
         $('#ccda_xml').html(xml);
     }
 })(jQuery); // End of use strict
+
+function fillSelectors(){
+	var url = TRUCARE_API + "inpatient-authorization-configuration";
+	
+	var response = getVariables(prepareGetTruCare())
+	//alert(response);
+}
+
+function prepareGetTruCare(url){
+	
+	// Get some values from elements on the page
+	var settings = {
+	  "async": true,
+	  "crossDomain": true,
+	  "url": url,
+	  "method": "GET",
+	};
+
+	return settings;
+
+}
+function preparePostTruCare(url, dataJson){
+	
+	// Get some values from elements on the page
+	var settings = {
+	  "async": true,
+	  "crossDomain": true,
+	  "url": url,
+	  "method": "POST",
+	  "headers": {
+		"content-type": "application/json",
+	  },
+	  "processData": false,
+	  "data": dataJson
+	};
+
+	return settings;
+
+}
+
+function getVariables(settings){
+		//Response of call to Trucare API
+	$.ajax(settings).done(
+			function(response) {
+				alert(response);
+			}
+	);
+
+}
+
+function callProcedureSearch(settings){
+	//Response of call to Trucare API
+	$.ajax(settings).done(
+			function(response) {
+				document.getElementById('procedure_search').innerHTML = response[0].procedureName;
+			});		
+}
+
+function callDiagnosisSearch(settings){
+	//Response of call to Trucare API
+	$.ajax(settings).done(
+			function(response) {
+				document.getElementById('diagnosis_search').innerHTML = response[0].diagnosisName;
+			});		
+}
+
+function callMemberSearch(settings){
+	//Response of call to Trucare API
+	$.ajax(settings).done(
+			function(response) {
+				var buttonProfile = "<td style=\"text-align: center\" id=\"btn-text\" >"
+						+ "<button type=\"button\" onclick=\"location.href=\'profile.html\';\" id=\"select_btn\" class=\"btn btn-success btn-sm\">SELECT</button>"
+						+ "</td>";
+
+				//Fake profile
+				var newRow = document.createElement('tr');
+				newRow.innerHTML += buttonProfile + 
+						"<td>" + '1000000' + "</td>" + 
+						"<td>" + 'Jane' + "</td>" + 
+						"<td>" + 'Doe' + "</td>" + 
+						"<td>" + '1959-03-03' + "</td>";
+
+				document.getElementById('tableBody').appendChild(newRow);
+
+				// Profiles from Trucare
+				for ( var i in response.searchResults) {
+					var newRow = document.createElement('tr');
+					newRow.innerHTML += buttonProfile + 
+							"<td>" + response.searchResults[i].externalMemberId + "</td>" + 
+							"<td>" + response.searchResults[i].firstName + "</td>" + 
+							"<td>" + response.searchResults[i].lastName + "</td>" + 
+							"<td>" + response.searchResults[i].dateOfBirth + "</td>";
+
+					document.getElementById('tableBody').appendChild(newRow);
+				}
+			});		
+}
+
+function prepareMemberSearch(){
+	var elements = '';
+	if (document.getElementById('patient_id').value.length != 0){
+		elements += '"externalMemberId" : "'+ 
+			document.getElementById('patient_id').value +
+			'",\r\n';
+	}
+	if (document.getElementById('first_name').value.length != 0){
+		elements += '"firstName" : "'+ 
+			document.getElementById('first_name').value +
+			'",\r\n';
+	}
+	if (document.getElementById('last_name').value.length != 0){
+		elements += '"lastName" : "'+ 
+			document.getElementById('last_name').value +
+			'",\r\n';
+	}
+	if (document.getElementById('_dob').value.length != 0){
+		elements += '"dob" : "'+ 
+			document.getElementById('_dob').value +
+			'",\r\n';
+	}
+	
+	var value01 = '{"startIndex" : 0,"length" : 10,\r\n';
+	var value02 = '"gotoLastPage" : false}'
+
+	var values = value01 + elements + value02
+	return values;						
+}
+	
+var TRUCARE_API = "http://Tesch:Password1@50.225.27.88:9080/trucare-api-6.2.0.TC620/6.2.0/api/";		
