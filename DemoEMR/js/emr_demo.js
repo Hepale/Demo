@@ -333,7 +333,9 @@ function prepareGetTruCare(url){
 	{
 	  "async": true,
 	  "crossDomain": true,
-	  "url": url,
+	  "url": url,	  
+		"username":"Tesch",
+		"password":"Password1", 
 	  "method": "GET",
 	  "headers": {
 		"Authorization": "Basic " + btoa("Tesch:Password1")
@@ -382,7 +384,7 @@ function callProcedureSearch(settings){
 	$.ajax(settings).done(
 			function(response) {
 				for (var i in response){
-					   $('<option/>').val(response[i].diagnosisCode).html(response[i].diagnosisName).appendTo('#procedure_search');
+					   $('<option/>').val(response[i].procedureCode).html(response[i].procedureName).appendTo('#procedure_search');
 				}				
 			});		
 }
@@ -459,4 +461,50 @@ function prepareMemberSearch(){
 	return values;						
 }
 	
-var TRUCARE_API = "http://50.225.27.88:9080/trucare-api-6.2.0.TC620/6.2.0/api/";		
+var TRUCARE_API = "http://Tesch:Password1@50.225.27.88:9080/trucare-api-6.2.0.TC620/6.2.0/api/";		
+
+document.getElementById('searchForm').addEventListener('submit', performPostRequest);
+
+function performPostRequest(e) {
+  var memberSearch = prepareMemberSearch();
+  alert("Message to send:\n"+ memberSearch);
+axios({
+    url: TRUCARE_API + "members-search",
+    method: 'post',
+    headers: {'Content-type': 'application/json; charset=UTF-8'},
+    data: memberSearch
+}).then(onGradeResult, onGradeError)
+	
+}
+
+
+//XMLHttpRequest cannot load http://50.225.27.88:9080/trucare-api-6.2.0.TC620/6.2.0/api/members-search. Response to preflight request doesn't pass access control check: No 'Access-Control-Allow-Origin' header is present on the requested resource. Origin 'null' is therefore not allowed access. The response had HTTP status code 401.  
+	//Response of call to Trucare API
+// 	$.ajax(settings).done(
+// 			function(response) {
+// 				var buttonProfile = "<td style=\"text-align: center\" id=\"btn-text\" >"
+// 						+ "<button type=\"button\" onclick=\"location.href=\'profile.html\';\" id=\"select_btn\" class=\"btn btn-success btn-sm\">SELECT</button>"
+// 						+ "</td>";
+// 
+// 				//Fake profile
+// 				var newRow = document.createElement('tr');
+// 				newRow.innerHTML += buttonProfile + 
+// 						"<td>" + '1000000' + "</td>" + 
+// 						"<td>" + 'Jane' + "</td>" + 
+// 						"<td>" + 'Doe' + "</td>" + 
+// 						"<td>" + '1959-03-03' + "</td>";
+// 
+// 				document.getElementById('tableBody').appendChild(newRow);
+// 
+// 				// Profiles from Trucare
+// 				for ( var i in response.searchResults) {
+// 					var newRow = document.createElement('tr');
+// 					newRow.innerHTML += buttonProfile + 
+// 							"<td>" + response.searchResults[i].externalMemberId + "</td>" + 
+// 							"<td>" + response.searchResults[i].firstName + "</td>" + 
+// 							"<td>" + response.searchResults[i].lastName + "</td>" + 
+// 							"<td>" + response.searchResults[i].dateOfBirth + "</td>";
+// 
+// 					document.getElementById('tableBody').appendChild(newRow);
+// 				}
+// 			});		
